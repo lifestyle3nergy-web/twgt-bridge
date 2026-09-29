@@ -13,6 +13,7 @@ import {
   BRIDGE_VERSION,
 } from "../lib/collector.mjs";
 import { admit, States } from "../lib/admission.mjs";
+import { validateEvidenceBatch } from "../lib/evidence-contract.mjs";
 
 function usage() {
   console.error("usage: GITHUB_TOKEN=<token> node bin/collect.mjs <owner>/<repo> [out-dir]");
@@ -65,12 +66,26 @@ await step("repo-meta", () => collectRepoMeta(client, owner, repo));
 await step("pulls", () => collectPulls(client, owner, repo));
 await step("workflow-runs", () => collectWorkflowRuns(client, owner, repo));
 
-const decision = admit({ evidence: batch, prior: { entries: batch.entries }, apiError });
+let decision = admit({ evidence: batch, prior: { entries: batch.entries }, apiError });
+const document = { decision, batch };
+const contract = validateEvidenceBatch(document);
+if (!contract.ok) {
+  decision = {
+    state: States.HELD,
+    reason: "EVIDENCE_CONTRACT_VIOLATION",
+    detail: { errors: contract.errors },
+  };
+  document.decision = decision;
+  console.error(`[HELD] EVIDENCE_CONTRACT_VIOLATION: ${contract.errors.join("; ")}`);
+} else {
+  console.log("[VALIDATED] evidence-batch contract");
+}
+
 console.log(`[${decision.state}] ${decision.reason}`);
 
 if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
 const outFile = join(outDir, `${owner}-${repo}-${stamp}.json`);
-writeFileSync(outFile, JSON.stringify({ decision, batch }, null, 2));
+writeFileSync(outFile, JSON.stringify(document, null, 2));
 console.log(`wrote ${outFile}`);
 
 process.exit(decision.state === States.ADMITTED ? 0 : 1);
