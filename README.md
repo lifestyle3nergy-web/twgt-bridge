@@ -1,8 +1,14 @@
 # twgt-bridge
 
+**Three-repository contract:** `engineering-intelligence` defines the problem, `twgt-schema-gate` enforces the machine-checkable boundary, and `twgt-bridge` independently verifies the implementation.
+
 **Read-only evidence collector. This repository writes nothing to any other repository. It has no merge authority. It runs on read-only credentials.**
 
 The bridge is a governed collector for TWGT. It retrieves repository metadata, files, pull request metadata, commit metadata, and workflow run metadata from GitHub, and writes signed-by-SHA evidence records to a local directory. It does not create branches, does not commit to other repositories, does not open pull requests, and does not merge anything. There is no `file.put`. There is no `pr.merge`. Those capabilities are a separate, reviewed change with their own threat model, and they do not belong in a read-only collector.
+
+## Fail-closed baseline
+
+The first collection has no prior trustworthy baseline and must return `HELD`. Subsequent collections use the previous evidence artifact as the baseline; the collector must never manufacture its own baseline.
 
 ## Why read-only first
 
