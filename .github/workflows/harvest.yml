@@ -1,0 +1,61 @@
+name: harvest
+
+on:
+  schedule:
+    # Every 6 hours. Adjust as the harvest becomes trusted.
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: harvest
+  cancel-in-progress: false
+
+jobs:
+  harvest:
+    name: harvest
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Collect read-only evidence
+        env:
+          GITHUB_TOKEN: ${{ secrets.READ_TOKEN }}
+        run: |
+          node bin/collect.mjs lifestyle3nergy-web/twgt-schema-gate evidence
+
+      - name: Verify pinned registry
+        env:
+          GITHUB_TOKEN: ${{ secrets.READ_TOKEN }}
+        run: |
+          node bin/verify-all.mjs pins || echo "verification did not ADMIT"
+
+      - name: Publish evidence to evidence/auto
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          BRANCH=evidence/auto
+          git config user.name "twgt-bridge-bot"
+          git config user.email "twgt-bridge-bot@users.noreply.github.com"
+
+          # Commit the collected evidence on a scratch branch. Never on main.
+          git checkout -B "$BRANCH"
+          git add evidence/
+          if git diff --cached --quiet; then
+            echo "no new evidence"
+            exit 0
+          fi
+          git commit -m "evidence: scheduled harvest $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          git push --force origin "$BRANCH"
