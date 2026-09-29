@@ -52,7 +52,7 @@ jobs:
 
           # Commit the collected evidence on a scratch branch. Never on main.
           git checkout -B "$BRANCH"
-          git add evidence/
+          git add -f evidence/
           if git diff --cached --quiet; then
             echo "no new evidence"
             exit 0
