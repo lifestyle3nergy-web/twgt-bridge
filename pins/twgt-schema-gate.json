@@ -1,8 +1,8 @@
 {
   "repo": "lifestyle3nergy-web/twgt-schema-gate",
-  "ref": "refs/heads/main",
-  "pinned_sha": "42050494577e433a1cbc0c82240d26c567aa8182",
-  "pinned_at": "2026-09-29T07:58:30Z",
+  "ref": "0aac3c32b06be40ca413a291ffaafe4ec12d0082",
+  "pinned_sha": "0aac3c32b06be40ca413a291ffaafe4ec12d0082",
+  "pinned_at": "2026-09-29T08:00:00Z",
   "registry_sha256": "40da59691e861b51243e0af64f59fe5aa7b117f6bf2a66bbca2881318c7ceb64",
   "schemas": {
     "schemas/registry.json": "40da59691e861b51243e0af64f59fe5aa7b117f6bf2a66bbca2881318c7ceb64",
@@ -14,6 +14,6 @@
     "schemas/v1/schema-violation.json": "b230a93d09b915ca2bd18a175cc86d9fb008b43e8b86347fea626cb3c3b96574",
     "schemas/v1/tool-invocation.json": "4f42b7073ee601e1d6963bca792142ffc48787c58c5a25e334df4254d3defac5",
     "schemas/v1/tool-result.json": "af974a9ae22946214c59a801d639695e9b718089d224fe062b6f260466442e69",
-    "schemas/v1/evidence-batch.json": "0a0376d8edc8e0c74d96e7c0b82af6f81c33529da60b859d993d5f47c7ad4825"
+    "schemas/v1/evidence-batch.json": "938ff965727ada4e32323432e8e337288e7445d142c39d794d07eec9e3e176fc"
   }
 }
