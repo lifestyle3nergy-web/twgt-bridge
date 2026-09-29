@@ -1,0 +1,18 @@
+{
+  "repo": "lifestyle3nergy-web/twgt-schema-gate",
+  "ref": "refs/heads/main",
+  "pinned_sha": "93fcb3bcba49caea3a1f6d0558142209d8053255",
+  "pinned_at": "2026-09-29T02:35:36.616Z",
+  "registry_sha256": "381e69934cf5d2c868975b926b0519966cb05a2ca2763d59df5ce59f908f0c8b",
+  "schemas": {
+    "schemas/registry.json": "381e69934cf5d2c868975b926b0519966cb05a2ca2763d59df5ce59f908f0c8b",
+    "schemas/v1/agent-request.json": "b5d19b57af3b812a38a99e211c362f3f53015cac1337d47ab5c9f0ea06e1deaa",
+    "schemas/v1/agent-response.json": "8ea5b1a402447a671985d361ceee6616c18b0148c29dbee210c231160a22dc11",
+    "schemas/v1/common/policy-decision.json": "7e90d75b5e7748a657eec872f108cfb7c9d7898ea31894e8631b067e6df8770e",
+    "schemas/v1/common/provenance.json": "a525a5ee65b644ec386314e5d97d23ff2115a42984936892c411102f2b6a2922",
+    "schemas/v1/common/trace-context.json": "27b030c68d912ff9845c69e695a30f090c6dd5ce55ab83dd2711d0cd86cdfbc4",
+    "schemas/v1/schema-violation.json": "b230a93d09b915ca2bd18a175cc86d9fb008b43e8b86347fea626cb3c3b96574",
+    "schemas/v1/tool-invocation.json": "4f42b7073ee601e1d6963bca792142ffc48787c58c5a25e334df4254d3defac5",
+    "schemas/v1/tool-result.json": "af974a9ae22946214c59a801d639695e9b718089d224fe062b6f260466442e69"
+  }
+}
