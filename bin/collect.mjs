@@ -4,14 +4,7 @@
 
 import { writeFileSync, mkdirSync, existsSync } from "node:fs";
 import { join, resolve } from "node:path";
-import {
-  makeClient,
-  collectRepoMeta,
-  collectPulls,
-  collectWorkflowRuns,
-  CollectorError,
-  BRIDGE_VERSION,
-} from "../lib/collector.mjs";
+import { makeClient, collectRepoMeta, collectPulls, collectWorkflowRuns, CollectorError, BRIDGE_VERSION } from "../lib/collector.mjs";
 import { admit, States } from "../lib/admission.mjs";
 import { validateEvidenceBatch } from "../lib/evidence-contract.mjs";
 
@@ -38,12 +31,7 @@ try {
 
 const collectedAt = new Date().toISOString();
 const stamp = collectedAt.replace(/[:.]/g, "-");
-const batch = {
-  bridge_version: BRIDGE_VERSION,
-  collected_at: collectedAt,
-  source: { owner, repo },
-  entries: [],
-};
+const batch = { bridge_version: BRIDGE_VERSION, collected_at: collectedAt, source: { owner, repo }, entries: [] };
 let apiError = null;
 
 async function step(name, fn) {
@@ -67,15 +55,16 @@ await step("pulls", () => collectPulls(client, owner, repo));
 await step("workflow-runs", () => collectWorkflowRuns(client, owner, repo));
 
 let decision = admit({ evidence: batch, prior: { entries: batch.entries }, apiError });
-const document = { decision, batch };
-const contract = validateEvidenceBatch(document);
+let document = { decision, batch };
+let contract = validateEvidenceBatch(document);
 if (!contract.ok) {
   decision = {
+    ...decision,
     state: States.HELD,
     reason: "EVIDENCE_CONTRACT_VIOLATION",
     detail: { errors: contract.errors },
   };
-  document.decision = decision;
+  document = { decision, batch };
   console.error(`[HELD] EVIDENCE_CONTRACT_VIOLATION: ${contract.errors.join("; ")}`);
 } else {
   console.log("[VALIDATED] evidence-batch contract");
