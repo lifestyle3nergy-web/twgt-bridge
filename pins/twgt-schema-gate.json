@@ -2,10 +2,10 @@
   "repo": "lifestyle3nergy-web/twgt-schema-gate",
   "ref": "refs/heads/main",
   "pinned_sha": "42050494577e433a1cbc0c82240d26c567aa8182",
-  "pinned_at": "2026-09-29T07:58:00Z",
-  "registry_sha256": "REQUIRES_POST_MERGE_PIN_REFRESH",
+  "pinned_at": "2026-09-29T07:58:30Z",
+  "registry_sha256": "40da59691e861b51243e0af64f59fe5aa7b117f6bf2a66bbca2881318c7ceb64",
   "schemas": {
-    "schemas/registry.json": "REQUIRES_POST_MERGE_PIN_REFRESH",
+    "schemas/registry.json": "40da59691e861b51243e0af64f59fe5aa7b117f6bf2a66bbca2881318c7ceb64",
     "schemas/v1/agent-request.json": "b5d19b57af3b812a38a99e211c362f3f53015cac1337d47ab5c9f0ea06e1deaa",
     "schemas/v1/agent-response.json": "8ea5b1a402447a671985d361ceee6616c18b0148c29dbee210c231160a22dc11",
     "schemas/v1/common/policy-decision.json": "7e90d75b5e7748a657eec872f108cfb7c9d7898ea31894e8631b067e6df8770e",
