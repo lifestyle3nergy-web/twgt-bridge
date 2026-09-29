@@ -2,7 +2,7 @@
 // twgt-bridge CLI. Read-only.
 // Usage: GITHUB_TOKEN=<token> node bin/collect.mjs <owner>/<repo> [out-dir]
 
-import { writeFileSync, mkdirSync, existsSync } from "node:fs";
+import { writeFileSync, mkdirSync, existsSync, readdirSync, readFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import {
   makeClient,
@@ -43,6 +43,27 @@ const batch = {
   source: { owner, repo },
   entries: [],
 };
+
+function loadPriorEvidence(dir) {
+  if (!existsSync(dir)) return null;
+  const candidates = readdirSync(dir)
+    .filter(name => name.endsWith(".json"))
+    .sort()
+    .reverse();
+  for (const name of candidates) {
+    try {
+      const parsed = JSON.parse(readFileSync(join(dir, name), "utf8"));
+      if (parsed?.batch?.collected_at && parsed?.batch?.source?.owner === owner && parsed?.batch?.source?.repo === repo) {
+        return parsed.batch;
+      }
+    } catch {
+      // Ignore malformed historical evidence; it is not a valid baseline.
+    }
+  }
+  return null;
+}
+
+const prior = loadPriorEvidence(outDir);
 let apiError = null;
 
 async function step(name, fn) {
@@ -65,7 +86,7 @@ await step("repo-meta", () => collectRepoMeta(client, owner, repo));
 await step("pulls", () => collectPulls(client, owner, repo));
 await step("workflow-runs", () => collectWorkflowRuns(client, owner, repo));
 
-const decision = admit({ evidence: batch, prior: { entries: batch.entries }, apiError });
+const decision = admit({ evidence: batch, prior, apiError });
 console.log(`[${decision.state}] ${decision.reason}`);
 
 if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
