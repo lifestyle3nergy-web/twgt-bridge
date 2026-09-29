@@ -13,6 +13,7 @@ import {
   BRIDGE_VERSION,
 } from "../lib/collector.mjs";
 import { admit, States } from "../lib/admission.mjs";
+import { makeEvidenceManifest } from "../lib/evidence.mjs";
 
 function usage() {
   console.error("usage: GITHUB_TOKEN=<token> node bin/collect.mjs <owner>/<repo> [out-dir]");
@@ -70,7 +71,8 @@ console.log(`[${decision.state}] ${decision.reason}`);
 
 if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
 const outFile = join(outDir, `${owner}-${repo}-${stamp}.json`);
-writeFileSync(outFile, JSON.stringify({ decision, batch }, null, 2));
+const manifest = makeEvidenceManifest(batch, decision);
+writeFileSync(outFile, JSON.stringify({ decision, batch, manifest }, null, 2));
 console.log(`wrote ${outFile}`);
 
 process.exit(decision.state === States.ADMITTED ? 0 : 1);
