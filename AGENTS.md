@@ -62,3 +62,24 @@ Open a PR that:
 4. States, in the PR description, what the agent cannot do
 
 If any of those four items is missing, the PR does not merge.
+
+## Prohibition: no admission state in the bridge
+
+The bridge is an evidence producer. It must not define, emit, return, or
+accept an `ADMITTED` state under any name or synonym.
+
+Concretely:
+
+- `lib/admission.mjs` exports `evaluate()` and defines `EVIDENCE_READY`, not
+  `admit()` and not `ADMITTED`.
+- `bin/hold.mjs`, `bin/collect.mjs`, `bin/verify-all.mjs`, and
+  `bin/verify-registry.mjs` return `EVIDENCE_READY` or `HELD`.
+- No workflow, script, or agent running inside this repository may promote
+  a state to `ADMITTED` on behalf of a reviewer.
+
+If a future task requires the bridge to participate in admission, that task
+must instead produce evidence and hand it to the consuming repository. The
+bridge stays read-only.
+
+`tests/no-admission-state.test.mjs` enforces this. A change that fails that
+test does not merge.

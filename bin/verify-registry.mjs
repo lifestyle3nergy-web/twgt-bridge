@@ -38,7 +38,7 @@ export function verifyAll(pin, fetcher) {
     }
     const failed = results.filter(r => !r.ok);
     return {
-      state: failed.length === 0 ? "ADMITTED" : "HELD",
+      state: failed.length === 0 ? "EVIDENCE_READY" : "HELD",
       pinned_sha: pin.pinned_sha,
       total: results.length,
       passed: results.length - failed.length,
@@ -80,5 +80,5 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   const fetcher = makeFetcher(token, owner, repo, pin.pinned_sha);
   const decision = await verifyAll(pin, fetcher);
   console.log(JSON.stringify(decision, null, 2));
-  process.exit(decision.state === "ADMITTED" ? 0 : 1);
+  process.exit(decision.state === "EVIDENCE_READY" ? 0 : 1);
 }
