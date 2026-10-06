@@ -27,12 +27,12 @@ test("verify: fetch error forces HELD", async () => {
   assert.equal(out.results[0].reason, "FETCH_ERROR");
 });
 
-test("verify: all-matching yields ADMITTED", async () => {
+test("verify: all-matching yields EVIDENCE_READY", async () => {
   const content = Buffer.from('{"ok":true}');
   const pin = { pinned_sha: "abc", schemas: { "schemas/registry.json": sha256(content) } };
   const fetcher = async () => content;
   const out = await verifyAll(pin, fetcher);
-  assert.equal(out.state, "ADMITTED");
+  assert.equal(out.state, "EVIDENCE_READY");
   assert.equal(out.passed, 1);
 });
 
@@ -52,8 +52,8 @@ test("verify: one mismatch among many forces HELD", async () => {
   assert.equal(out.failed, 1);
 });
 
-test("verify: empty schema map yields ADMITTED with zero total", async () => {
+test("verify: empty schema map yields EVIDENCE_READY with zero total", async () => {
   const out = await verifyAll({ pinned_sha: "abc", schemas: {} }, async () => Buffer.from(""));
-  assert.equal(out.state, "ADMITTED");
+  assert.equal(out.state, "EVIDENCE_READY");
   assert.equal(out.total, 0);
 });
