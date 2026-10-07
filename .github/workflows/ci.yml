@@ -22,5 +22,17 @@ jobs:
           for f in $(find lib bin tests -name '*.mjs'); do
             node --check "$f"
           done
+      - name: Checkout twgt-schema-gate for contract test
+        uses: actions/checkout@v4
+        with:
+          repository: lifestyle3nergy-web/twgt-schema-gate
+          ref: main
+          path: .twgt-schema-gate
+
       - name: Run fail-closed tests
-        run: node --test tests/
+        env:
+          TWGT_SCHEMA_GATE_PATH: ${{ github.workspace }}/.twgt-schema-gate
+        run: |
+          set -euo pipefail
+          shopt -s globstar
+          node --test tests/**/*.test.mjs
