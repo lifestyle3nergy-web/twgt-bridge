@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifestyle3nergy-web.github.io/twgt-schema-gate/schemas/v1/common/evaluation-record.json",
+  "title": "EvaluationRecord",
+  "description": "The output of twgt-bridge evaluate(). Reports whether collected evidence is EVIDENCE_READY or HELD, with one entry per check that ran. This is not an admission decision. Admission is a human act performed by the consuming repository.",
+  "type": "object",
+  "required": ["state", "checks", "reason"],
+  "additionalProperties": false,
+  "properties": {
+    "state": {
+      "description": "EVIDENCE_READY when every check passed. HELD when any check failed, returned inconclusive, or could not run.",
+      "enum": ["EVIDENCE_READY", "HELD"]
+    },
+    "reason": {
+      "description": "Aggregate reason. ALL_CHECKS_PASSED when state is EVIDENCE_READY. The reason of the first HELD check when state is HELD.",
+      "$ref": "evidence-reason-code.json"
+    },
+    "checks": {
+      "description": "One entry per evaluation step that ran, in the order performed.",
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "required": ["state", "reason"],
+        "additionalProperties": false,
+        "properties": {
+          "state": {
+            "enum": ["VALIDATED", "HELD"]
+          },
+          "reason": {
+            "$ref": "evidence-reason-code.json"
+          },
+          "age_seconds": {
+            "description": "Present only for time-based checks (FRESH, STALE_EVIDENCE).",
+            "type": "integer",
+            "minimum": 0
+          },
+          "detail": {
+            "description": "Optional structured detail. Present on API_ERROR and UNSUPPORTED_SCHEMA_VERSION.",
+            "type": ["object", "null"]
+          }
+        }
+      }
+    },
+    "detail": {
+      "description": "Optional structured detail on the aggregate result.",
+      "type": ["object", "null"]
+    }
+  }
+}
