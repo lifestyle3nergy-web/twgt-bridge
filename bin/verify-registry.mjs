@@ -22,8 +22,13 @@ export function verifyPinnedFile(content, expectedHash) {
 
 export function verifyAll(pin, fetcher) {
   // fetcher(path) -> Promise<Buffer>, throws on network/API error.
+  // Fail closed if schemas is missing, null, non-object, or empty.
+  const schemas = pin && pin.schemas;
+  if (!schemas || typeof schemas !== "object" || Array.isArray(schemas) || Object.keys(schemas).length === 0) {
+    return Promise.resolve({ state: "HELD", pinned_sha: pin && pin.pinned_sha, total: 0, passed: 0, failed: 1, results: [{ path: null, ok: false, reason: "PIN_SCHEMA_MISSING_OR_EMPTY" }] });
+  }
   const results = [];
-  const entries = Object.entries(pin.schemas);
+  const entries = Object.entries(schemas);
   return (async () => {
     for (const [path, expected] of entries) {
       let buf;
