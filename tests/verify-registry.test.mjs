@@ -52,8 +52,21 @@ test("verify: one mismatch among many forces HELD", async () => {
   assert.equal(out.failed, 1);
 });
 
-test("verify: empty schema map yields EVIDENCE_READY with zero total", async () => {
+
+test("verify: missing schemas forces HELD", async () => {
+  const out = await verifyAll({ pinned_sha: "abc" }, async () => Buffer.from(""));
+  assert.equal(out.state, "HELD");
+  assert.equal(out.results[0].reason, "PIN_SCHEMA_MISSING_OR_EMPTY");
+});
+
+test("verify: null schemas forces HELD", async () => {
+  const out = await verifyAll({ pinned_sha: "abc", schemas: null }, async () => Buffer.from(""));
+  assert.equal(out.state, "HELD");
+  assert.equal(out.results[0].reason, "PIN_SCHEMA_MISSING_OR_EMPTY");
+});
+
+test("verify: empty schema map forces HELD", async () => {
   const out = await verifyAll({ pinned_sha: "abc", schemas: {} }, async () => Buffer.from(""));
-  assert.equal(out.state, "EVIDENCE_READY");
-  assert.equal(out.total, 0);
+  assert.equal(out.state, "HELD");
+  assert.equal(out.results[0].reason, "PIN_SCHEMA_MISSING_OR_EMPTY");
 });
