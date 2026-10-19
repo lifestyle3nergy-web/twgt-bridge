@@ -1,0 +1,19 @@
+{
+  "_note": "Vendored from twgt-schema-gate/schemas/v1/common/evidence-reason-code.json. The two lists must match exactly. Drift fails tests/contract/reason-codes.test.mjs.",
+  "_source": "https://github.com/lifestyle3nergy-web/twgt-schema-gate/blob/main/schemas/v1/common/evidence-reason-code.json",
+  "_vendored_at": "2026-10-07",
+  "codes": [
+    "ALL_CHECKS_PASSED",
+    "API_ERROR",
+    "BASELINE_ABSENT",
+    "BASELINE_PRESENT",
+    "EVIDENCE_BAD_TIMESTAMP",
+    "EVIDENCE_MISSING_TIMESTAMP",
+    "EVIDENCE_MISSING_VERSION",
+    "FRESH",
+    "NO_API_ERROR",
+    "SCHEMA_VERSION_OK",
+    "STALE_EVIDENCE",
+    "UNSUPPORTED_SCHEMA_VERSION"
+  ]
+}

@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://lifestyle3nergy-web.github.io/twgt-schema-gate/schemas/v1/common/evidence-record.json",
+  "title": "EvidenceRecord",
+  "description": "The full document written by twgt-bridge to evidence/*.json. Contains three parts: the evaluation decision from evaluate(), the collected batch from collect.mjs, and a manifest that binds the two by SHA-256 hash. This is the shape a downstream consumer reads. It is not an admission decision.",
+  "type": "object",
+  "required": ["decision", "batch", "manifest"],
+  "additionalProperties": false,
+  "properties": {
+    "decision": {
+      "description": "The evaluation result. Same shape as evaluation-record.json.",
+      "$ref": "evaluation-record.json"
+    },
+    "batch": {
+      "description": "The collected evidence entries, one per named step that ran.",
+      "type": "object",
+      "required": ["bridge_version", "collected_at", "source", "entries"],
+      "additionalProperties": false,
+      "properties": {
+        "bridge_version": { "type": "string", "minLength": 1 },
+        "collected_at":   { "type": "string", "format": "date-time" },
+        "source": {
+          "type": "object",
+          "required": ["owner", "repo"],
+          "additionalProperties": false,
+          "properties": {
+            "owner": { "type": "string", "minLength": 1 },
+            "repo":  { "type": "string", "minLength": 1 }
+          }
+        },
+        "entries": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "object",
+            "required": ["name", "ok"],
+            "additionalProperties": false,
+            "properties": {
+              "name":   { "type": "string", "minLength": 1 },
+              "ok":     { "type": "boolean" },
+              "record": { "type": ["object", "null"] },
+              "error":  { "type": ["object", "null"] }
+            }
+          }
+        }
+      }
+    },
+    "manifest": {
+      "description": "Tamper-evident binding between batch and decision. payload_hash is SHA-256 of the batch; entry_count is the number of entries.",
+      "type": "object",
+      "required": ["evidence_version", "bridge_version", "collected_at", "source", "decision", "payload_hash", "entry_count"],
+      "additionalProperties": false,
+      "properties": {
+        "evidence_version": { "type": "string", "const": "1.0.0" },
+        "bridge_version":   { "type": "string", "minLength": 1 },
+        "collected_at":     { "type": "string", "format": "date-time" },
+        "source": {
+          "type": "object",
+          "required": ["owner", "repo"],
+          "additionalProperties": false,
+          "properties": {
+            "owner": { "type": "string", "minLength": 1 },
+            "repo":  { "type": "string", "minLength": 1 }
+          }
+        },
+        "decision": {
+          "type": "object",
+          "required": ["state", "reason"],
+          "additionalProperties": false,
+          "properties": {
+            "state":  { "enum": ["EVIDENCE_READY", "HELD"] },
+            "reason": { "$ref": "evidence-reason-code.json" }
+          }
+        },
+        "payload_hash": { "type": "string", "pattern": "^sha256:[0-9a-f]{64}$" },
+        "entry_count":  { "type": "integer", "minimum": 0 }
+      }
+    }
+  }
+}

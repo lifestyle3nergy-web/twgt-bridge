@@ -4,7 +4,7 @@
 
 import { readFileSync, existsSync } from "node:fs";
 import { resolve } from "node:path";
-import { admit, States } from "../lib/admission.mjs";
+import { evaluate, States } from "../lib/admission.mjs";
 
 function usage() {
   console.error("usage: node bin/hold.mjs <evidence-file.json> [--max-age-seconds N]");
@@ -43,7 +43,7 @@ if (!batch || !Array.isArray(batch.entries)) {
 }
 
 const apiError = batch.entries.find(e => e && e.ok === false) || null;
-const decision = admit({
+const decision = evaluate({
   evidence: batch,
   prior: { entries: batch.entries },
   apiError,
@@ -51,4 +51,4 @@ const decision = admit({
 });
 
 console.log(JSON.stringify(decision, null, 2));
-process.exit(decision.state === States.ADMITTED ? 0 : 1);
+process.exit(decision.state === States.EVIDENCE_READY ? 0 : 1);

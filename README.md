@@ -45,3 +45,17 @@ Four fail-closed tests. Each asserts that a specific failure condition produces 
 ## License
 
 MIT — see `LICENSE`.
+
+## Boundary
+
+This repository produces evidence. It does not admit.
+
+The bridge collects, normalizes, and verifies. When every check passes, it
+returns `EVIDENCE_READY`. When any check fails, it returns `HELD`. It does
+not return `ADMITTED`, and it does not decide whether the underlying change
+should be accepted. Admission is a human act performed by the consuming
+repository's review authority.
+
+The rule applies to code, tests, and documentation. A future change that
+reintroduces an admission state into `lib/` or `bin/` will fail
+`tests/no-admission-state.test.mjs`.

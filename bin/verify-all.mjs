@@ -62,7 +62,7 @@ for (const name of pinFiles) {
 
 const anyHeld = results.some(r => r.state === "HELD");
 const combined = {
-  state: anyHeld ? "HELD" : "ADMITTED",
+  state: anyHeld ? "HELD" : "EVIDENCE_READY",
   pin_count: pinFiles.length,
   pinned_repos: results.map(r => r.repo || r.pin),
   results,

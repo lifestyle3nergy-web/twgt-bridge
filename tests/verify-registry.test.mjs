@@ -1,7 +1,6 @@
 import { test } from "node:test";
 import { strict as assert } from "node:assert";
 import { sha256, verifyPinnedFile, verifyAll } from "../bin/verify-registry.mjs";
-import { ReasonCode } from "../lib/admission.mjs";
 
 test("verify: hash of empty string is stable", () => {
   assert.equal(sha256(Buffer.from("")), "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855");
@@ -28,12 +27,12 @@ test("verify: fetch error forces HELD", async () => {
   assert.equal(out.results[0].reason, "FETCH_ERROR");
 });
 
-test("verify: all-matching yields ADMITTED", async () => {
+test("verify: all-matching yields EVIDENCE_READY", async () => {
   const content = Buffer.from('{"ok":true}');
   const pin = { pinned_sha: "abc", schemas: { "schemas/registry.json": sha256(content) } };
   const fetcher = async () => content;
   const out = await verifyAll(pin, fetcher);
-  assert.equal(out.state, "ADMITTED");
+  assert.equal(out.state, "EVIDENCE_READY");
   assert.equal(out.passed, 1);
 });
 
@@ -53,20 +52,21 @@ test("verify: one mismatch among many forces HELD", async () => {
   assert.equal(out.failed, 1);
 });
 
+
 test("verify: missing schemas forces HELD", async () => {
   const out = await verifyAll({ pinned_sha: "abc" }, async () => Buffer.from(""));
   assert.equal(out.state, "HELD");
-  assert.equal(out.results[0].reason, ReasonCode.PIN_SCHEMA_MISSING_OR_EMPTY);
+  assert.equal(out.results[0].reason, "PIN_SCHEMA_MISSING_OR_EMPTY");
 });
 
 test("verify: null schemas forces HELD", async () => {
   const out = await verifyAll({ pinned_sha: "abc", schemas: null }, async () => Buffer.from(""));
   assert.equal(out.state, "HELD");
-  assert.equal(out.results[0].reason, ReasonCode.PIN_SCHEMA_MISSING_OR_EMPTY);
+  assert.equal(out.results[0].reason, "PIN_SCHEMA_MISSING_OR_EMPTY");
 });
 
 test("verify: empty schema map forces HELD", async () => {
   const out = await verifyAll({ pinned_sha: "abc", schemas: {} }, async () => Buffer.from(""));
   assert.equal(out.state, "HELD");
-  assert.equal(out.results[0].reason, ReasonCode.PIN_SCHEMA_MISSING_OR_EMPTY);
+  assert.equal(out.results[0].reason, "PIN_SCHEMA_MISSING_OR_EMPTY");
 });

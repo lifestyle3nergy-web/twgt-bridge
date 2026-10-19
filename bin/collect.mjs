@@ -12,7 +12,7 @@ import {
   CollectorError,
   BRIDGE_VERSION,
 } from "../lib/collector.mjs";
-import { admit, States } from "../lib/admission.mjs";
+import { evaluate, States } from "../lib/admission.mjs";
 import { makeEvidenceManifest } from "../lib/evidence.mjs";
 
 function usage() {
@@ -66,7 +66,7 @@ await step("repo-meta", () => collectRepoMeta(client, owner, repo));
 await step("pulls", () => collectPulls(client, owner, repo));
 await step("workflow-runs", () => collectWorkflowRuns(client, owner, repo));
 
-const decision = admit({ evidence: batch, prior: { entries: batch.entries }, apiError });
+const decision = evaluate({ evidence: batch, prior: { entries: batch.entries }, apiError });
 console.log(`[${decision.state}] ${decision.reason}`);
 
 if (!existsSync(outDir)) mkdirSync(outDir, { recursive: true });
@@ -75,4 +75,4 @@ const manifest = makeEvidenceManifest(batch, decision);
 writeFileSync(outFile, JSON.stringify({ decision, batch, manifest }, null, 2));
 console.log(`wrote ${outFile}`);
 
-process.exit(decision.state === States.ADMITTED ? 0 : 1);
+process.exit(decision.state === States.EVIDENCE_READY ? 0 : 1);

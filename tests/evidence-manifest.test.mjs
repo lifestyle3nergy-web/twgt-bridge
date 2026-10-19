@@ -4,7 +4,7 @@ import { digestEvidence,makeEvidenceManifest,validateManifest } from "../lib/evi
 
 test("evidence manifest binds exact batch",()=>{
   const batch={bridge_version:"0.1.0",collected_at:"2026-09-29T00:00:00.000Z",source:{owner:"o",repo:"r"},entries:[]};
-  const decision={state:"ADMITTED",reason:"ALL_CHECKS_PASSED"};
+  const decision={state:"EVIDENCE_READY",reason:"ALL_CHECKS_PASSED"};
   const manifest=makeEvidenceManifest(batch,decision);
   assert.match(manifest.payload_hash,/^sha256:[0-9a-f]{64}$/);
   assert.equal(validateManifest(manifest,batch).state,"VALIDATED");
