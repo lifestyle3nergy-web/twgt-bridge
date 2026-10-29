@@ -1,0 +1,42 @@
+name: TWGT Gate (Shadow Mode)
+
+on:
+  pull_request:
+    paths:
+      - '.twgt/relationships/**/*.json'
+
+jobs:
+  gate:
+    runs-on: ubuntu-latest
+    # SHADOW MODE: We want to see the output, but not block the PR yet
+    continue-on-error: true
+    steps:
+      - name: Checkout PR
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Build TWGT Gate
+        run: |
+          git clone https://github.com/lifestyle3nergy-web/twgt-schema-gate.git /tmp/twgt-gate
+          cd /tmp/twgt-gate
+          npm ci
+          npm run build
+
+      - name: Run Gate Diagnostics
+        run: |
+          # Find all relationship JSON files in the PR
+          FILES=$(find .twgt/relationships -name "*.json")
+          if [ -z "$FILES" ]; then
+            echo "No relationship files found."
+            exit 0
+          fi
+
+          # Run the gate for each file in diagnostic mode
+          for FILE in $FILES; do
+            echo "=== Validating $FILE ==="
+            node /tmp/twgt-gate/dist/index.js "$FILE" --local
+          done
