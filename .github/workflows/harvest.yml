@@ -2,12 +2,11 @@ name: harvest
 
 on:
   schedule:
-    # Every 6 hours. Adjust as the harvest becomes trusted.
     - cron: '0 */6 * * *'
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: harvest
@@ -35,27 +34,14 @@ jobs:
         run: |
           node bin/collect.mjs lifestyle3nergy-web/twgt-schema-gate evidence
 
-      - name: Verify pinned registry
+      - name: Verify pinned registry (fail-closed)
         env:
           GITHUB_TOKEN: ${{ secrets.READ_TOKEN }}
-        run: |
-          node bin/verify-all.mjs pins || echo "verification did not ADMIT"
+        run: node bin/verify-all.mjs pins
 
-      - name: Publish evidence to evidence/auto
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          set -euo pipefail
-          BRANCH=evidence/auto
-          git config user.name "twgt-bridge-bot"
-          git config user.email "twgt-bridge-bot@users.noreply.github.com"
-
-          # Commit the collected evidence on a scratch branch. Never on main.
-          git checkout -B "$BRANCH"
-          git add -f evidence/
-          if git diff --cached --quiet; then
-            echo "no new evidence"
-            exit 0
-          fi
-          git commit -m "evidence: scheduled harvest $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          git push --force origin "$BRANCH"
+      - name: Upload evidence as reviewable artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: evidence-${{ github.run_id }}
+          path: evidence/
+          retention-days: 90
