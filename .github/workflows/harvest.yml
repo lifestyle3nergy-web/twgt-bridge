@@ -39,7 +39,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.READ_TOKEN }}
         run: |
-          node bin/verify-all.mjs pins || echo "verification did not ADMIT"
+          node bin/verify-all.mjs pins
 
       - name: Publish evidence to evidence/auto
         env:
@@ -58,4 +58,4 @@ jobs:
             exit 0
           fi
           git commit -m "evidence: scheduled harvest $(date -u +%Y-%m-%dT%H:%M:%SZ)"
-          git push --force origin "$BRANCH"
+          git push origin "$BRANCH"
